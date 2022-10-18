@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	// models "mygram/app/models/mysql"
 )
 
 type MySQL struct {
@@ -25,6 +26,8 @@ func SetupMySQL() *MySQL {
 	}
 	// Enable Logger, show detailed log
 	db.Logger.LogMode(4)
+
+	// db.AutoMigrate(models.User{}, models.Comment{}, models.Photo{}, models.SocialMedia{})
 
 	// Connection Pool
 	sqlDB, err := db.DB()

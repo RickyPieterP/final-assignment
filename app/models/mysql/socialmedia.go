@@ -7,7 +7,7 @@ import (
 
 type SocialMedia struct {
 	Id             int       `gorm:"column:id;primary_key"`
-	UserID         int       `gorm:"column:user_id`
+	UserID         int       `gorm:"column:user_id"`
 	Name           string    `gorm:"column:name"`
 	SocialMediaUrl string    `gorm:"column:social_media_url"`
 	Title          string    `gorm:"column:title"`
@@ -16,5 +16,5 @@ type SocialMedia struct {
 }
 
 func (SocialMedia) TableName() string {
-	return constant.PHOTO
+	return constant.SOCIALMEDIA
 }

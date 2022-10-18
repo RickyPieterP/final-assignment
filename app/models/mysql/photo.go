@@ -7,7 +7,7 @@ import (
 
 type Photo struct {
 	Id           int       `gorm:"column:id;primary_key"`
-	UserId       int       `gorm:"column:user_id`
+	UserId       int       `gorm:"column:user_id"`
 	Title        string    `gorm:"column:title"`
 	Caption      string    `gorm:"column:caption"`
 	PhotoUrl     string    `gorm:"column:photo_url"`

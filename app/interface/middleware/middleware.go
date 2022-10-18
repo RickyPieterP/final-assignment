@@ -11,6 +11,7 @@ type middleware struct {
 
 type Middleware interface {
 	RegisterUser(*gin.Context)
+	LoginUser(c *gin.Context)
 }
 
 func NewMiddleware(container *container.Container) Middleware {

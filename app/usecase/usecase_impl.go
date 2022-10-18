@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"mygram/app/models/mysql"
 	"mygram/app/repository/mysql/comment"
 	"mygram/app/repository/mysql/photo"
@@ -55,4 +56,41 @@ func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.Registe
 	httpStatus = 201
 
 	return
+}
+
+func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserResp, httpStatus int, err error) {
+	var sqlUser mysql.User
+	sqlUser.Email = in.Email
+	fmt.Println(in.Email, "email")
+	user, err := u.userRepo.Find(sqlUser)
+
+	if err != nil {
+		return nil, 400, err
+	}
+	
+	err = ValidatePassword([]byte(user.Password), []byte(in.Password))
+	if err != nil {
+		err = fmt.Errorf("%s", "your not allowed")
+		return nil, 400, err
+	}
+
+	jwtToken := request.JWTToken {
+		Id: sqlUser.Id,
+		Username: sqlUser.Username,
+	}
+
+	token, err := GenerateToken(jwtToken)
+	fmt.Println(err, "error")
+	if err != nil {
+		return nil, 500, err
+	}
+	res := &response.LoginUserResp{
+		Token: token,
+	}
+	
+	return res, 200, nil
+}
+
+func (u *usecase) UpdateUser(in request.UpdateUserReq) {
+	
 }

@@ -3,6 +3,8 @@ package mysql
 import (
 	"mygram/app/shared/constant"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -17,4 +19,15 @@ type User struct {
 
 func (User) TableName() string {
 	return constant.USER
+}
+
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	u.Created_Date = time.Now()
+	u.Updated_At = time.Now()
+	return
+}
+
+func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
+	u.Updated_At = time.Now()
+	return
 }

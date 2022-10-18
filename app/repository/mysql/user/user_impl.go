@@ -21,4 +21,9 @@ func (u *userRepo) SaveOrUpdate(in mysql.User) (out mysql.User, err error) {
 	return
 }
 
+func (u *userRepo) Find(in mysql.User) (out mysql.User, err error) {
+	err = u.mysql.Where("email = ?", in.Email).First(&out).Error
+	return
+}
+
 func (*userRepo) DeleteUser() {}

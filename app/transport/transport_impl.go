@@ -26,3 +26,16 @@ func (t *Transport) RegisterUser(c *gin.Context) {
 
 	c.JSON(httpStatus, res)
 }
+
+func (t *Transport) LoginUser(c *gin.Context) {
+	body := c.MustGet("body").(request.LoginUserReq)
+
+	res, httpStatus, err := t.usecase.LoginUser(body)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+		return
+	}
+}
