@@ -92,5 +92,5 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 }
 
 func (u *usecase) UpdateUser(in request.UpdateUserReq) {
-	
+	// var sqlUser mysql.User
 }

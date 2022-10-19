@@ -26,11 +26,15 @@ func GenerateToken(in request.JWTToken) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(10 * time.Minute)
-	claims["id"] = in.Id
+	claims["user_id"] = in.Id
 	claims["user"] = in.Username
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
+}
+
+func ValidateToken(token string) {
+
 }
