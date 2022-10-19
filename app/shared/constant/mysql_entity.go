@@ -1,8 +1,8 @@
 package constant
 
 const (
-	USER        = "mygram.user"
-	PHOTO       = "mygram.photo"
-	COMMENT     = "mygram.comment"
-	SOCIALMEDIA = "mygram.socialmedia"
+	USER        = "hacktiv.user"
+	PHOTO       = "hacktiv.photo"
+	COMMENT     = "hacktiv.comment"
+	SOCIALMEDIA = "hacktiv.socialmedia"
 )

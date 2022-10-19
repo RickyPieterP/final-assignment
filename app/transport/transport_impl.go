@@ -32,7 +32,10 @@ func (t *Transport) LoginUser(c *gin.Context) {
 
 	res, httpStatus, err := t.usecase.LoginUser(body)
 	if err != nil {
-		c.JSON(httpStatus, err)
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.JSON(httpStatus, resp)
 		return
 	} else {
 		c.JSON(httpStatus, res)
@@ -53,4 +56,3 @@ func (t *Transport) CreatePhoto(c *gin.Context) {
 		c.JSON(httpStatus, res)
 	}
 }
-

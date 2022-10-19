@@ -24,7 +24,7 @@ var DB = database{
 			envy.Get("MYSQL_PASSWORD"),
 			envy.Get("MYSQL_HOST"),
 			envy.Get("MYSQL_PORT"),
-			envy.Get("MYSQL_DRIVE"),
+			envy.Get("MYSQL_Name", "hacktiv"),
 		),
 	},
 }
