@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt"
 )
 
 func (m *middleware) AuthJwt(ctx *gin.Context) {
@@ -88,4 +89,27 @@ func (m *middleware) LoginUser(c *gin.Context) {
 
 	c.Set("body", req)
 	c.Next()
+}
+
+func (m *middleware) ValidateUser(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	tokenMap := map[string]string{
+		"user_id": "",
+	}
+	tokenString, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		return "", nil	
+	})
+	fmt.Println(tokenString)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if claims, err := tokenString.Claims.(jwt.MapClaims); err && tokenString.Valid {
+		fmt.Println("claims", claims)
+		for key, val := range claims {
+			if s, ok := val.(string); ok {
+				tokenMap[key] = s
+			}
+		}
+	}
 }
