@@ -52,6 +52,7 @@ func (m *middleware) ValidateUser(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	tokenMap := map[string]string{
 		"user_id": "",
+		"user": "",
 	}
 	tokenString, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return "", nil	
@@ -69,4 +70,6 @@ func (m *middleware) ValidateUser(c *gin.Context) {
 			}
 		}
 	}
+
+	c.Set("user_id", tokenMap["user_id"])
 }

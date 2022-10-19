@@ -40,3 +40,17 @@ func (t *Transport) LoginUser(c *gin.Context) {
 	}
 }
 
+func (t *Transport) CreatePhoto(c *gin.Context) {
+	body := c.MustGet("body").(request.CreatePhotoReq)
+	user_id := c.MustGet("user_id").(int)
+
+	body.UserId = user_id
+	res, httpStatus, err := t.usecase.CreatePhoto(&body)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+

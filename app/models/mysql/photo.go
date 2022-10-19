@@ -3,6 +3,8 @@ package mysql
 import (
 	"mygram/app/shared/constant"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Photo struct {
@@ -17,4 +19,10 @@ type Photo struct {
 
 func (Photo) TableName() string {
 	return constant.PHOTO
+}
+
+func (p *Photo) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Created_Date = time.Now()
+	p.Updated_At = time.Now()
+	return
 }

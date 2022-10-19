@@ -94,3 +94,30 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 func (u *usecase) UpdateUser(in request.UpdateUserReq) {
 	// var sqlUser mysql.User
 }
+
+
+func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
+	photo := &mysql.Photo {
+		UserId: in.UserId,
+		Title: in.Title,
+		Caption: in.Caption,
+		PhotoUrl: in.PhotoUrl,
+	}
+
+	res, err := u.photoRepo.Create(photo)
+	if err != nil {
+		fmt.Println(err, "error di create photo")
+		return nil, 400, err
+	}
+
+	resp := &response.CreatePhotoResp{
+		Id: res.Id,
+		Title: res.Title,
+		Caption: res.Caption,
+		PhotoUrl: res.PhotoUrl,
+		CreatedAt: res.Created_Date,
+	}
+	return resp, 200, nil
+}
+
+func (u *usecase) FindPhoto() 
