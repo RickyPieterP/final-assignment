@@ -16,6 +16,6 @@ func setupRouter(transport *transport.Tp, middleware middleware.Middleware, app 
 	})
 
 	users := app.Group("/users")
-	users.POST("/register", middleware.RegisterUser, transport.Transport.RegisterUser)
+	users.POST("/register", middleware.AuthJwt, middleware.RegisterUser, transport.Transport.RegisterUser)
 	users.POST("/login", middleware.LoginUser, transport.Transport.LoginUser)
 }
