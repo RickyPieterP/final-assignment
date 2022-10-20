@@ -6,3 +6,4 @@ type RegisterUserRes struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 }
+

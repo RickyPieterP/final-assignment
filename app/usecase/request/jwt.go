@@ -1,7 +1,7 @@
 package request
 
 type JWTToken struct {
-	Id       string `json:"id"`
+	Id       int `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/golang-jwt/jwt"
 )
 
 func (m *middleware) AuthJwt(ctx *gin.Context) {
@@ -91,28 +90,75 @@ func (m *middleware) LoginUser(c *gin.Context) {
 	c.Next()
 }
 
-func (m *middleware) ValidateUser(c *gin.Context) {
-	token := c.GetHeader("Authorization")
-	tokenMap := map[string]string{
-		"user_id": "",
-		"user": "",
-	}
-	tokenString, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		return "", nil	
-	})
-	fmt.Println(tokenString)
+func (m *middleware) CreatePhoto(c *gin.Context) {
+	var req request.CreatePhotoReq
+
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		fmt.Println(err)
-	}
-
-	if claims, err := tokenString.Claims.(jwt.MapClaims); err && tokenString.Valid {
-		fmt.Println("claims", claims)
-		for key, val := range claims {
-			if s, ok := val.(string); ok {
-				tokenMap[key] = s
-			}
+		resp := map[string]interface{}{
+			"message": err.Error(),
 		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
 	}
 
-	c.Set("user_id", tokenMap["user_id"])
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+	
+	jwt := c.MustGet("jwt").(*uc.Token)
+	req.UserId = jwt.Id
+
+	c.Set("body", req)
+	c.Next()
+}
+
+func (m *middleware) FindPhoto(c *gin.Context) {
+	var req request.FindReq
+	
+	jwt := c.MustGet("jwt").(*uc.Token)
+	req.UserId = jwt.Id
+
+	c.Set("user_id", req)
+	c.Next()
+}
+
+func (m *middleware) UpdatePhoto(c *gin.Context) {
+	var req request.UpdatePhoto
+
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+	
+	jwt := c.MustGet("jwt").(*uc.Token)
+	req.UserId = jwt.Id
+
+	c.Set("body", req)
+	c.Next()
+}
+
+func (m *middleware) DeletePhoto(c *gin.Context) {
+	jwt := c.MustGet("jwt").(*uc.Token)
+
+	c.Set("user_id", jwt.Id)
+	c.Next()
 }

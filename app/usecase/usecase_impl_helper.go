@@ -11,7 +11,7 @@ import (
 )
 
 type Token struct {
-	Id       string
+	Id       int
 	Email    string
 	Username string
 }
@@ -77,9 +77,15 @@ func ValidateToken(tokString string) (*Token, error) {
 	}
 
 	bytePayload, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	var token Token
 	err = json.Unmarshal(bytePayload, &token)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	return &token, nil
 }
