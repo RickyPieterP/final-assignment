@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"fmt"
 	uc "mygram/app/usecase"
 	"mygram/app/usecase/request"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +29,7 @@ func (m *middleware) AuthJwt(ctx *gin.Context) {
 	tokStr := bearer[1]
 
 	tok, err := uc.ValidateToken(tokStr)
-
+	fmt.Println(err, "errr")
 	if err != nil {
 		resp := map[string]interface{}{
 			"message": "Need Sign In",
@@ -110,8 +112,9 @@ func (m *middleware) CreatePhoto(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
-	
+
 	jwt := c.MustGet("jwt").(*uc.Token)
+	fmt.Println(jwt.Id, "jwt id")
 	req.UserId = jwt.Id
 
 	c.Set("body", req)
@@ -120,7 +123,7 @@ func (m *middleware) CreatePhoto(c *gin.Context) {
 
 func (m *middleware) FindPhoto(c *gin.Context) {
 	var req request.FindReq
-	
+
 	jwt := c.MustGet("jwt").(*uc.Token)
 	req.UserId = jwt.Id
 
@@ -140,6 +143,8 @@ func (m *middleware) UpdatePhoto(c *gin.Context) {
 		return
 	}
 
+	photoId, _ := strconv.Atoi(c.Param("photoId"))
+	req.Id = photoId
 	v := validator.New()
 	if err := v.Struct(req); err != nil {
 		resp := map[string]interface{}{
@@ -148,7 +153,7 @@ func (m *middleware) UpdatePhoto(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 		return
 	}
-	
+
 	jwt := c.MustGet("jwt").(*uc.Token)
 	req.UserId = jwt.Id
 
@@ -158,7 +163,8 @@ func (m *middleware) UpdatePhoto(c *gin.Context) {
 
 func (m *middleware) DeletePhoto(c *gin.Context) {
 	jwt := c.MustGet("jwt").(*uc.Token)
-
+	photoId, _ := strconv.Atoi(c.Param("photoId"))
 	c.Set("user_id", jwt.Id)
+	c.Set("photo_id", photoId)
 	c.Next()
 }

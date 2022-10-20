@@ -1,6 +1,7 @@
 package photo
 
 import (
+	"fmt"
 	"mygram/app/adapter/database"
 	"mygram/app/models/mysql"
 )
@@ -21,7 +22,9 @@ func (p *photoRepo) Find(in int) (out []mysql.Photo, err error) {
 }
 
 func (p *photoRepo) FindOne(in int) (out *mysql.Photo, err error) {
-	err = p.mysql.Where("id = ?", in).First(out).Error
+	out = &mysql.Photo{}
+	err = p.mysql.Where("id = ?", &in).First(out).Error
+	fmt.Println(err, "error di findOne")
 	return
 }
 
@@ -33,13 +36,18 @@ func (p *photoRepo) Create(in *mysql.Photo) (out *mysql.Photo, err error) {
 	return in, nil
 }
 
-func (p *photoRepo) Update(in mysql.Photo) (out *mysql.Photo, err error) {
-	err = p.mysql.Save(in).Error
-	return
+func (p *photoRepo) Update(in *mysql.Photo) (out *mysql.Photo, err error) {
+	out = &mysql.Photo{}
+	err = p.mysql.Where("id = ?", in.Id).Updates(in).Error
+	if err != nil {
+		return nil, err
+	}
+	p.mysql.Where("id = ?", in.Id).First(out)
+	return out, nil
 }
 
 func (p *photoRepo) Delete(in int) (out bool, err error) {
-	row := p.mysql.Delete(in)
+	row := p.mysql.Model(&mysql.Photo{}).Where("id = ?", in).Delete(&mysql.Photo{})
 	if row.RowsAffected != 0 {
 		out = true
 		return out, nil

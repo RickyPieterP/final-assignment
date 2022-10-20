@@ -1,8 +1,10 @@
 package transport
 
 import (
+	"fmt"
 	"mygram/app/usecase"
 	"mygram/app/usecase/request"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,8 +58,8 @@ func (t *Transport) CreatePhoto(c *gin.Context) {
 }
 
 func (t *Transport) FindPhoto(c *gin.Context) {
-	req := c.MustGet("user_id").(*request.FindReq)
-	res, httpStatus, err := t.usecase.FindPhoto(req)
+	req := c.MustGet("user_id").(request.FindReq)
+	res, httpStatus, err := t.usecase.FindPhoto(&req)
 	if err != nil {
 		c.JSON(httpStatus, err)
 		return
@@ -66,4 +68,27 @@ func (t *Transport) FindPhoto(c *gin.Context) {
 	}
 }
 
-// func (t *Transport) 
+func (t *Transport) UpdatePhoto(c *gin.Context) {
+	req := c.MustGet("body").(request.UpdatePhoto)
+	res, err := t.usecase.UpdatePhoto(&req)
+	fmt.Println(err, "error")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else {
+		c.JSON(http.StatusCreated, res)
+	}
+}
+
+func (t *Transport) DeletePhoto(c *gin.Context) {
+	user_id := c.MustGet("user_id").(int)
+	photo_id := c.MustGet("photo_id").(int)
+	res, err := t.usecase.DeletePhoto(photo_id, user_id)
+	fmt.Println(err, "error")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else {
+		c.JSON(http.StatusCreated, res)
+	}
+}

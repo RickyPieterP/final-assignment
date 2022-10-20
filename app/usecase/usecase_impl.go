@@ -99,6 +99,7 @@ func (u *usecase) UpdateUser(in request.UpdateUserReq) {
 }
 
 func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
+	fmt.Println(in.UserId, "in user id")
 	photo := &mysql.Photo{
 		UserId:   in.UserId,
 		Title:    in.Title,
@@ -118,6 +119,7 @@ func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreateP
 		Caption:   res.Caption,
 		PhotoUrl:  res.PhotoUrl,
 		CreatedAt: res.Created_Date,
+		UserId: in.UserId,
 	}
 	return resp, 200, nil
 }
@@ -126,7 +128,7 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 	user := mysql.User{
 		Id: in.UserId,
 	}
-	user, err = u.userRepo.Find(user)
+	user, err = u.userRepo.FindById(user)
 	if err != nil {
 		fmt.Println(err, "error di find")
 		return
@@ -135,6 +137,7 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 		Email: user.Email,
 		Username: user.Username,
 	}
+	fmt.Println(singleUser, "single user")
 	res, err := u.photoRepo.Find(in.UserId)
 	for i := 0; i < len(res); i++ {
 		
@@ -155,7 +158,7 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 }
 
 func(u *usecase) UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
-	photo := mysql.Photo{
+	photo := &mysql.Photo{
 		Id: in.Id,
 		Title: in.Title,
 		Caption: in.Caption,
@@ -165,23 +168,25 @@ func(u *usecase) UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhoto
 	if err != nil {
 		return
 	}
-
-	if check.UserId == in.UserId {
+	fmt.Println(check.UserId, "check user id")
+	fmt.Println(in.UserId, "in user id")
+	if check.UserId != in.UserId {
 		err = fmt.Errorf("%s", "your unauthorized")
 		return
 	}
 
 	res, err := u.photoRepo.Update(photo)
+	fmt.Println(err, "error")
 	if err != nil {
 		return
 	}
-
+	fmt.Println(res, "res")
 	out = &response.UpdatePhotoResp{
 		Id: res.Id,
 		Title: res.Title,
 		Caption: res.Caption,
 		PhotoUrl: res.PhotoUrl,
-		UserId: res.UserId,
+		UserId: in.UserId,
 		UpdatedAt: res.Updated_At,
 	}
 	return
@@ -193,7 +198,7 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 		return
 	}
 
-	if check.UserId == user_id {
+	if check.UserId != user_id {
 		err = fmt.Errorf("%s", "your unauthorized")
 		return
 	}
