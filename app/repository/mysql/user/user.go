@@ -6,5 +6,6 @@ type RepositoryUser interface {
 	SaveOrUpdate(in mysql.AddUser) (out mysql.User, err error)
 	Find(in mysql.User) (out mysql.User, err error)
 	FindById(in mysql.User) (out mysql.User, err error)
-	DeleteUser()
+	UpdateUser(in mysql.User) (out mysql.User, err error)
+	DeleteUser(in mysql.User) error
 }
