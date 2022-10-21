@@ -23,4 +23,7 @@ func setupRouter(transport *transport.Tp, middleware middleware.Middleware, app 
 	photo.GET("/", middleware.AuthJwt, middleware.FindPhoto, transport.Transport.FindPhoto)
 	photo.PUT("/:photoId", middleware.AuthJwt, middleware.UpdatePhoto, transport.Transport.UpdatePhoto)
 	photo.DELETE("/:photoId", middleware.AuthJwt, middleware.DeletePhoto, transport.Transport.DeletePhoto)
+	socmed := app.Group("/socialmedias")
+	socmed.POST("/POST", middleware.AuthJwt, middleware.CreateSocialMedia, transport.Transport.CreateSocialMedia)
+	// socmed.GET("/", middleware.AuthJwt, middleware.FindSocialMedia, transport.Transport.SocialMedia)
 }
