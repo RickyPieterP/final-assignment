@@ -92,3 +92,52 @@ func (t *Transport) DeletePhoto(c *gin.Context) {
 		c.JSON(http.StatusCreated, res)
 	}
 }
+
+func (t *Transport) CreateComment(c *gin.Context) {
+	body := c.MustGet("body").(request.CreateCommentReq)
+
+	res, httpStatus, err := t.usecase.CreateComment(&body)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) FindComment(c *gin.Context) {
+	req := c.MustGet("user_id").(request.FindCommentReq)
+	res, httpStatus, err := t.usecase.FindComment(&req)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) UpdateComment(c *gin.Context) {
+	req := c.MustGet("body").(request.UpdateComment)
+	res, err := t.usecase.UpdateComment(&req)
+	fmt.Println(res, "RES TP")
+	fmt.Println(err, "error TP")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else {
+		c.JSON(http.StatusCreated, res)
+	}
+}
+
+func (t *Transport) DeleteComment(c *gin.Context) {
+	user_id := c.MustGet("user_id").(int)
+	comment_id := c.MustGet("comment_id").(int)
+	res, err := t.usecase.DeleteComment(comment_id, user_id)
+	fmt.Println(err, "error")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else {
+		c.JSON(http.StatusCreated, res)
+	}
+}

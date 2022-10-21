@@ -17,6 +17,10 @@ type Middleware interface {
 	FindPhoto(c *gin.Context)
 	UpdatePhoto(c *gin.Context)
 	DeletePhoto(c *gin.Context)
+	CreateComment(c *gin.Context)
+	FindComment(c *gin.Context)
+	UpdateComment(c *gin.Context)
+	DeleteComment(c *gin.Context)
 }
 
 func NewMiddleware(container *container.Container) Middleware {

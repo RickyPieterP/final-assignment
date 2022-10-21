@@ -12,4 +12,8 @@ type Usecase interface {
 	FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, httpStatus int, err error)
 	UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error)
 	DeletePhoto(in, user_id int) (out *response.DeletePhoto, err error)
+	CreateComment(in *request.CreateCommentReq) (out *response.CreateCommentResp, httpStatus int, err error)
+	FindComment(in *request.FindCommentReq) (out []response.FindCommentResp, httpStatus int, err error)
+	UpdateComment(in *request.UpdateComment) (out *response.UpdateCommentResp, err error)
+	DeleteComment(in, user_id int) (out *response.DeleteComment, err error)
 }
