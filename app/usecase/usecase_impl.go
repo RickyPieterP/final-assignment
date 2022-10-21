@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"fmt"
 	"mygram/app/models/mysql"
 	"mygram/app/repository/mysql/comment"
@@ -36,7 +35,7 @@ func NewUsecase(
 }
 
 func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.RegisterUserRes, httpStatus int) {
-	var sqlUser mysql.User
+	var sqlUser mysql.AddUser
 
 	password, _ := GeneratePassword([]byte(in.Password))
 
@@ -54,7 +53,7 @@ func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.Registe
 
 	out.Age = userData.Age
 	out.Email = userData.Email
-	out.ID = userData.Id
+	// out.ID = userData.Id
 	out.Username = userData.Username
 	httpStatus = 201
 
@@ -95,57 +94,8 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 	return res, 200, nil
 }
 
-func (u *usecase) UpdateUser(in request.UpdateUserReq) (out *response.UpdateUserRes, httpStatus int, err error) {
-	user := mysql.User{
-		Id: in.Id,
-	}
-
-	req, err := u.userRepo.FindById(user)
-	if err != nil {
-		return nil, http.StatusNotFound, err
-	}
-	req.Email = in.Email
-	req.Username = in.Username
-	req.Updated_At = time.Now()
-
-	resp, err := u.userRepo.UpdateUser(req)
-
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
-	out = &response.UpdateUserRes{
-		Age:       req.Age,
-		Email:     resp.Email,
-		ID:        in.Id,
-		Username:  resp.Username,
-		UpdatedAt: resp.Updated_At.Format("2006-01-02"),
-	}
-
-	return
-}
-
-func (u *usecase) DeleteUser(in Token) (out *response.DeleteUser, httpStatus int, err error) {
-
-	user := mysql.User{
-		Id: in.Id,
-	}
-
-	_, err = u.userRepo.FindById(user)
-	if err != nil {
-		return nil, http.StatusNotFound, err
-	}
-
-	err = u.userRepo.DeleteUser(user)
-
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
-	out = &response.DeleteUser{
-		Message: "Your account has been successfully deleted",
-	}
-	return
+func (u *usecase) UpdateUser(in request.UpdateUserReq) {
+	// var sqlUser mysql.User
 }
 
 func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
@@ -267,106 +217,117 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 	}
 }
 
-func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error) {
-	var sqlSocialMedia mysql.SocialMedia
-
-	userId := userID.(int)
-
-	sqlSocialMedia.Name = in.Name
-	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
-	sqlSocialMedia.UserID = userId
-
-	data, err := u.socialmediaRepo.SaveOrUpdate(sqlSocialMedia)
-	if err != nil {
-		fmt.Println(err.Error())
+func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.CreateCommentResp, httpStatus int, err error) {
+	fmt.Println(in.UserIdComment, "in user id")
+	comment := &mysql.Comment{
+		UserId:  in.UserIdComment,
+		PhotoId: in.PhotoId,
+		Title:   in.Tittle,
+		Message: in.Message,
 	}
 
-	out.ID = data.Id
-	out.Name = data.Name
-	out.SocialMediaURL = data.SocialMediaUrl
-	out.UserID = userId
-	out.CreatedAt = data.Created_Date
+	res, err := u.commentRepo.Create(comment)
+	if err != nil {
+		fmt.Println(err, "error di create photo")
+		return nil, 400, err
+	}
 
+	resp := &response.CreateCommentResp{
+		Id:        res.Id,
+		UserId:    res.UserId,
+		PhotoId:   res.PhotoId,
+		Tittle:    res.Title,
+		Message:   res.Message,
+		CreatedAt: res.Created_Date,
+	}
+	return resp, 200, nil
+}
+
+func (u *usecase) FindComment(in *request.FindCommentReq) (out []response.FindCommentResp, httpStatus int, err error) {
+	user := mysql.User{
+		Id: in.UserId,
+	}
+	user, err = u.userRepo.FindById(user)
+	if err != nil {
+		fmt.Println(err, "error di find")
+		return
+	}
+	singleUser := response.UserComment{
+		Email:    user.Email,
+		Username: user.Username,
+	}
+	fmt.Println(singleUser, "single user")
+	res, err := u.commentRepo.Find(in.UserId)
+	for i := 0; i < len(res); i++ {
+
+		single := response.FindCommentResp{
+			Id:        res[i].Id,
+			Message:   res[i].Message,
+			PhotoId:   res[i].UserId,
+			UserId:    in.UserId,
+			CreatedAt: res[i].Created_Date,
+			UpdatedAt: res[i].Updated_At,
+			User:      singleUser,
+		}
+
+		out = append(out, single)
+	}
 	return
 }
 
-func (u *usecase) FindSocialMedia(in any) (out response.FindSocialMediaRes, httpStatus int, err error) {
-	var sqlUser mysql.User
+func (u *usecase) UpdateComment(in *request.UpdateComment) (out *response.UpdateCommentResp, err error) {
+	comment := &mysql.Comment{
+		Id:      in.Id,
+		Title:   in.TitleValue,
+		Message: in.MessageValue,
+	}
 
-	userId := in.(int)
-	sqlUser.Id = userId
-
-	dataUser, err := u.userRepo.FindById(sqlUser)
+	check, err := u.commentRepo.FindOne(comment.Id)
 	if err != nil {
-		fmt.Println(err.Error())
+		return
 	}
 
-	dataSocialMedia, err := u.socialmediaRepo.Find(userId)
+	if check.UserId != in.UserId {
+		err = fmt.Errorf("%s", "your unauthorized")
+		return
+	}
+
+	res, err := u.commentRepo.Update(comment)
 	if err != nil {
-		fmt.Println(err.Error())
+		return
 	}
-
-	out.ID = dataSocialMedia.Id
-	out.Name = dataSocialMedia.Name
-	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
-	out.UserID = userId
-	out.CreatedAt = dataSocialMedia.Created_Date
-	out.UpdatedAt = dataSocialMedia.Updated_At
-	out.User = response.User{
-		ID:       userId,
-		Username: dataUser.Username,
-		// ProfileImageURL: dataSocialMedia.ProfileImageURL,
+	fmt.Println("Hasil Update == ", res)
+	out = &response.UpdateCommentResp{
+		Id:        res.Id,
+		Title:     res.Title,
+		Message:   res.Message,
+		UserId:    in.UserId,
+		UpdatedAt: res.Updated_At,
 	}
-
 	return
 }
 
-func (u *usecase) UpdateSocialMedia(in request.UpdateSocialMediaReq, userID any, socialMediaID any) (out response.UpdateSocialMediaRes, httpStatus int, err error) {
-
-	userId := userID.(int)
-	socialMediaId := socialMediaID.(int)
-
-	sqlSocialMedia, err := u.socialmediaRepo.FindById(socialMediaId)
+func (u *usecase) DeleteComment(in, user_id int) (out *response.DeleteComment, err error) {
+	check, err := u.commentRepo.FindOne(user_id)
 	if err != nil {
-		httpStatus = 500
 		return
 	}
 
-	if sqlSocialMedia.UserID != userId {
-		err = errors.New("Unauthorize")
-		httpStatus = http.StatusUnauthorized
-
+	if check.UserId != user_id {
+		err = fmt.Errorf("%s", "your unauthorized")
 		return
 	}
 
-	sqlSocialMedia.Name = in.Name
-	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
-
-	dataSocialMedia, err := u.socialmediaRepo.SaveOrUpdate(sqlSocialMedia)
+	res, err := u.commentRepo.Delete(in)
 	if err != nil {
-		httpStatus = 500
 		return
 	}
-
-	out.ID = dataSocialMedia.Id
-	out.Name = dataSocialMedia.Name
-	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
-	out.UserID = dataSocialMedia.UserID
-	out.UpdateAt = dataSocialMedia.Updated_At
-
-	return
-}
-
-func (u *usecase) DeleteSocialMedia(socialMediaID any) (out string, httpStatus int, err error) {
-	// userId := userID.(int)
-	socialMediaId := socialMediaID.(int)
-
-	err = u.socialmediaRepo.Delete(socialMediaId)
-	if err != nil {
-		httpStatus = 500
+	if !res {
+		return
+	} else {
+		out = &response.DeleteComment{
+			Message: "Your comment has been successfully deleted",
+		}
 		return
 	}
-
-	out = "Your social media has been successfully deleted"
-	return
 }

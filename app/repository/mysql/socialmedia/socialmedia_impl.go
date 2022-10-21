@@ -15,23 +15,18 @@ func NewRepositorySocialMedia(mysql *database.MySQL) RepositorySocialMedia {
 	}
 }
 
-func (s *socialmediaRepo) Find(in int) (out mysql.SocialMedia, err error) {
-	_ = s.mysql.DB.Where("user_id = ?", &in).Find(&out).Error
-	return
+func (s socialmediaRepo) Find(id int) {
+	
 }
 
-func (s *socialmediaRepo) SaveOrUpdate(in mysql.SocialMedia) (out mysql.SocialMedia, err error) {
-	err = s.mysql.Debug().Save(&in).Error
-	out = in
-	return
+func (s socialmediaRepo) Create(in mysql.SocialMedia) {
+
 }
 
-func (s *socialmediaRepo) FindById(in int) (out mysql.SocialMedia, err error) {
-	_ = s.mysql.DB.Where("id = ?", &in).Find(&out).Error
-	return
+func (s socialmediaRepo) Update(in mysql.SocialMedia) {
+
 }
 
-func (s *socialmediaRepo) Delete(id int) (err error) {
-	err = s.mysql.Delete(&mysql.SocialMedia{}, id).Error
-	return
+func (s socialmediaRepo) Delete(id int) {
+
 }
