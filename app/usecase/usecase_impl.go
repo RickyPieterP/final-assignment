@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"mygram/app/models/mysql"
 	"mygram/app/repository/mysql/comment"
@@ -35,7 +36,7 @@ func NewUsecase(
 }
 
 func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.RegisterUserRes, httpStatus int) {
-	var sqlUser mysql.AddUser
+	var sqlUser mysql.User
 
 	password, _ := GeneratePassword([]byte(in.Password))
 
@@ -53,7 +54,7 @@ func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.Registe
 
 	out.Age = userData.Age
 	out.Email = userData.Email
-	// out.ID = userData.Id
+	out.ID = userData.Id
 	out.Username = userData.Username
 	httpStatus = 201
 
@@ -94,8 +95,57 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 	return res, 200, nil
 }
 
-func (u *usecase) UpdateUser(in request.UpdateUserReq) {
-	// var sqlUser mysql.User
+func (u *usecase) UpdateUser(in request.UpdateUserReq) (out *response.UpdateUserRes, httpStatus int, err error) {
+	user := mysql.User{
+		Id: in.Id,
+	}
+
+	req, err := u.userRepo.FindById(user)
+	if err != nil {
+		return nil, http.StatusNotFound, err
+	}
+	req.Email = in.Email
+	req.Username = in.Username
+	req.Updated_At = time.Now()
+
+	resp, err := u.userRepo.UpdateUser(req)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	out = &response.UpdateUserRes{
+		Age:       req.Age,
+		Email:     resp.Email,
+		ID:        in.Id,
+		Username:  resp.Username,
+		UpdatedAt: resp.Updated_At.Format("2006-01-02"),
+	}
+
+	return
+}
+
+func (u *usecase) DeleteUser(in Token) (out *response.DeleteUser, httpStatus int, err error) {
+
+	user := mysql.User{
+		Id: in.Id,
+	}
+
+	_, err = u.userRepo.FindById(user)
+	if err != nil {
+		return nil, http.StatusNotFound, err
+	}
+
+	err = u.userRepo.DeleteUser(user)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	out = &response.DeleteUser{
+		Message: "Your account has been successfully deleted",
+	}
+	return
 }
 
 func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
@@ -217,6 +267,7 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 	}
 }
 
+<<<<<<< HEAD
 func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.CreateCommentResp, httpStatus int, err error) {
 	fmt.Println(in.UserIdComment, "in user id")
 	comment := &mysql.Comment{
@@ -330,4 +381,108 @@ func (u *usecase) DeleteComment(in, user_id int) (out *response.DeleteComment, e
 		}
 		return
 	}
+=======
+func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error) {
+	var sqlSocialMedia mysql.SocialMedia
+
+	userId := userID.(int)
+
+	sqlSocialMedia.Name = in.Name
+	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
+	sqlSocialMedia.UserID = userId
+
+	data, err := u.socialmediaRepo.SaveOrUpdate(sqlSocialMedia)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	out.ID = data.Id
+	out.Name = data.Name
+	out.SocialMediaURL = data.SocialMediaUrl
+	out.UserID = userId
+	out.CreatedAt = data.Created_Date
+
+	return
+}
+
+func (u *usecase) FindSocialMedia(in any) (out response.FindSocialMediaRes, httpStatus int, err error) {
+	var sqlUser mysql.User
+
+	userId := in.(int)
+	sqlUser.Id = userId
+
+	dataUser, err := u.userRepo.FindById(sqlUser)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	dataSocialMedia, err := u.socialmediaRepo.Find(userId)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	out.ID = dataSocialMedia.Id
+	out.Name = dataSocialMedia.Name
+	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
+	out.UserID = userId
+	out.CreatedAt = dataSocialMedia.Created_Date
+	out.UpdatedAt = dataSocialMedia.Updated_At
+	out.User = response.User{
+		ID:       userId,
+		Username: dataUser.Username,
+		// ProfileImageURL: dataSocialMedia.ProfileImageURL,
+	}
+
+	return
+}
+
+func (u *usecase) UpdateSocialMedia(in request.UpdateSocialMediaReq, userID any, socialMediaID any) (out response.UpdateSocialMediaRes, httpStatus int, err error) {
+
+	userId := userID.(int)
+	socialMediaId := socialMediaID.(int)
+
+	sqlSocialMedia, err := u.socialmediaRepo.FindById(socialMediaId)
+	if err != nil {
+		httpStatus = 500
+		return
+	}
+
+	if sqlSocialMedia.UserID != userId {
+		err = errors.New("Unauthorize")
+		httpStatus = http.StatusUnauthorized
+
+		return
+	}
+
+	sqlSocialMedia.Name = in.Name
+	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
+
+	dataSocialMedia, err := u.socialmediaRepo.SaveOrUpdate(sqlSocialMedia)
+	if err != nil {
+		httpStatus = 500
+		return
+	}
+
+	out.ID = dataSocialMedia.Id
+	out.Name = dataSocialMedia.Name
+	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
+	out.UserID = dataSocialMedia.UserID
+	out.UpdateAt = dataSocialMedia.Updated_At
+
+	return
+}
+
+func (u *usecase) DeleteSocialMedia(socialMediaID any) (out string, httpStatus int, err error) {
+	// userId := userID.(int)
+	socialMediaId := socialMediaID.(int)
+
+	err = u.socialmediaRepo.Delete(socialMediaId)
+	if err != nil {
+		httpStatus = 500
+		return
+	}
+
+	out = "Your social media has been successfully deleted"
+	return
+>>>>>>> e1086dbf4a7be4024ac466c15b0c2f840136ae9f
 }

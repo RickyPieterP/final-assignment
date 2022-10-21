@@ -45,6 +45,40 @@ func (t *Transport) LoginUser(c *gin.Context) {
 	}
 }
 
+func (t *Transport) UpdateUser(c *gin.Context) {
+	body := c.MustGet("body").(request.UpdateUserReq)
+
+	res, httpStatus, err := t.usecase.UpdateUser(body)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.JSON(httpStatus, resp)
+		return
+	} else {
+		c.JSON(http.StatusOK, res)
+		return
+	}
+}
+
+func (t *Transport) DeleteUser(c *gin.Context) {
+	body := c.MustGet("body").(*usecase.Token)
+
+	res, httpStatus, err := t.usecase.DeleteUser(*body)
+	fmt.Println("RES===", res)
+	fmt.Println("RES===", err)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.JSON(httpStatus, resp)
+		return
+	} else {
+		c.JSON(http.StatusOK, res)
+		return
+	}
+}
+
 func (t *Transport) CreatePhoto(c *gin.Context) {
 	body := c.MustGet("body").(request.CreatePhotoReq)
 
@@ -93,10 +127,17 @@ func (t *Transport) DeletePhoto(c *gin.Context) {
 	}
 }
 
+<<<<<<< HEAD
 func (t *Transport) CreateComment(c *gin.Context) {
 	body := c.MustGet("body").(request.CreateCommentReq)
 
 	res, httpStatus, err := t.usecase.CreateComment(&body)
+=======
+func (t *Transport) CreateSocialMedia(c *gin.Context) {
+	body := c.MustGet("body").(request.CreateSocialMediaReq)
+	userID := c.MustGet("user_id")
+	res, httpStatus, err := t.usecase.CreateSocialMedia(body, userID)
+>>>>>>> e1086dbf4a7be4024ac466c15b0c2f840136ae9f
 	if err != nil {
 		c.JSON(httpStatus, err)
 		return
@@ -105,9 +146,15 @@ func (t *Transport) CreateComment(c *gin.Context) {
 	}
 }
 
+<<<<<<< HEAD
 func (t *Transport) FindComment(c *gin.Context) {
 	req := c.MustGet("user_id").(request.FindCommentReq)
 	res, httpStatus, err := t.usecase.FindComment(&req)
+=======
+func (t *Transport) FindSocialMedia(c *gin.Context) {
+	userID := c.MustGet("user_id")
+	res, httpStatus, err := t.usecase.FindSocialMedia(userID)
+>>>>>>> e1086dbf4a7be4024ac466c15b0c2f840136ae9f
 	if err != nil {
 		c.JSON(httpStatus, err)
 		return
@@ -116,6 +163,7 @@ func (t *Transport) FindComment(c *gin.Context) {
 	}
 }
 
+<<<<<<< HEAD
 func (t *Transport) UpdateComment(c *gin.Context) {
 	req := c.MustGet("body").(request.UpdateComment)
 	res, err := t.usecase.UpdateComment(&req)
@@ -139,5 +187,30 @@ func (t *Transport) DeleteComment(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusCreated, res)
+=======
+func (t *Transport) UpdateSocialMedia(c *gin.Context) {
+	body := c.MustGet("body").(request.UpdateSocialMediaReq)
+	userID := c.MustGet("user_id")
+	socialMediaID := c.MustGet("social_media_id")
+	res, httpStatus, err := t.usecase.UpdateSocialMedia(body, userID, socialMediaID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) DeleteSocialMedia(c *gin.Context) {
+	// body := c.MustGet("body").(request.UpdateSocialMediaReq)
+	// userID := c.MustGet("user_id")
+	socialMediaID := c.MustGet("social_media_id")
+	res, httpStatus, err := t.usecase.DeleteSocialMedia(socialMediaID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+>>>>>>> e1086dbf4a7be4024ac466c15b0c2f840136ae9f
 	}
 }
