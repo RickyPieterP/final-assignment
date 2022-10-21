@@ -216,3 +216,122 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 		return
 	}
 }
+
+
+func (u *usecase) CreateComment(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
+	fmt.Println(in.UserId, "in user id")
+	// photo := &mysql.Comment{
+	// 	UserId:   in.UserId,
+	// 	Title:    in.Title,
+
+	// }
+
+	// res, err := u.commentRepo.Create()
+	// if err != nil {
+	// 	fmt.Println(err, "error di create photo")
+	// 	return nil, 400, err
+	// }
+
+	// resp := &response.CreatePhotoResp{
+	// 	Id:        res.Id,
+	// 	Title:     res.Title,
+	// 	Caption:   res.Caption,
+	// 	PhotoUrl:  res.PhotoUrl,
+	// 	CreatedAt: res.Created_Date,
+	// 	UserId: in.UserId,
+	// }
+	return out, 200, nil
+}
+
+func (u *usecase) FindComment(in *request.FindReq) (out []response.FindPhotoResp, httpStatus int, err error) {
+	user := mysql.User{
+		Id: in.UserId,
+	}
+	user, err = u.userRepo.FindById(user)
+	if err != nil {
+		fmt.Println(err, "error di find")
+		return
+	}
+	singleUser := response.UserPhoto{
+		Email: user.Email,
+		Username: user.Username,
+	}
+	fmt.Println(singleUser, "single user")
+	res, err := u.photoRepo.Find(in.UserId)
+	for i := 0; i < len(res); i++ {
+		
+		single := response.FindPhotoResp{
+			Id: res[i].Id,
+			Title: res[i].Title,
+			Caption: res[i].Caption,
+			PhotoUrl: res[i].PhotoUrl,
+			UserId: in.UserId,
+			CreatedAt: res[i].Created_Date,
+			UpdatedAt: res[i].Updated_At,
+			User: singleUser,
+		}
+
+		out = append(out, single)
+	}
+	return
+}
+
+func(u *usecase) UpdateComment(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
+	photo := &mysql.Photo{
+		Id: in.Id,
+		Title: in.Title,
+		Caption: in.Caption,
+		PhotoUrl: in.PhotoUrl,
+	}
+	check, err := u.photoRepo.FindOne(photo.Id)
+	if err != nil {
+		return
+	}
+	fmt.Println(check.UserId, "check user id")
+	fmt.Println(in.UserId, "in user id")
+	if check.UserId != in.UserId {
+		err = fmt.Errorf("%s", "your unauthorized")
+		return
+	}
+
+	res, err := u.photoRepo.Update(photo)
+	fmt.Println(err, "error")
+	if err != nil {
+		return
+	}
+	fmt.Println(res, "res")
+	out = &response.UpdatePhotoResp{
+		Id: res.Id,
+		Title: res.Title,
+		Caption: res.Caption,
+		PhotoUrl: res.PhotoUrl,
+		UserId: in.UserId,
+		UpdatedAt: res.Updated_At,
+	}
+	return
+}
+
+func (u *usecase) DeleteComment(in, user_id int) (out *response.DeletePhoto, err error) {
+	check, err := u.photoRepo.FindOne(user_id)
+	if err != nil {
+		return
+	}
+
+	if check.UserId != user_id {
+		err = fmt.Errorf("%s", "your unauthorized")
+		return
+	}
+
+	res, err := u.photoRepo.Delete(in)
+	if err != nil {
+		return
+	}
+	if !res {
+		return
+	} else {
+		out = &response.DeletePhoto{
+			Message: "Your photo has been successfully deleted",
+		}
+		return
+	}
+}
