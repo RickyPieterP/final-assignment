@@ -22,6 +22,11 @@ type Middleware interface {
 	// Social Media
 	CreateSocialMedia(c *gin.Context)
 	FindSocialMedia(c *gin.Context)
+	// Comment
+	CreateComment(c *gin.Context)
+	FindComment(c *gin.Context)
+	UpdateComment(c *gin.Context)
+	DeleteComment(c *gin.Context)
 }
 
 func NewMiddleware(container *container.Container) Middleware {

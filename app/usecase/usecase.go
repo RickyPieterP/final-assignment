@@ -13,5 +13,9 @@ type Usecase interface {
 	UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error)
 	DeletePhoto(in, user_id int) (out *response.DeletePhoto, err error)
 	CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error)
+	CreateComment(in *request.CreateCommentReq) (out *response.CreateCommentResp, httpStatus int, err error)
+	FindComment(in *request.FindCommentReq) (out []response.FindCommentResp, httpStatus int, err error)
+	UpdateComment(in *request.UpdateCommentReq) (out *response.UpdateCommentResp, err error)
+	DeleteComment(in, user_id int) (out *response.DeleteCommentResp, err error)
 	// FindSocialMedia(in request.FindSocialMediaReq) (out response.FindSocialMediaRes, err error)
 }

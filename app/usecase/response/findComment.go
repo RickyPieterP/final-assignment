@@ -9,17 +9,17 @@ type FindCommentResp struct {
 	UserId    int          `json:"user_id"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	CreatedAt time.Time    `json:"created_at"`
-	User      CommentUser  `json:"User"`
-	Photo     CommentPhoto `json:"Photo"`
+	User      UserComment  `json:"User"`
+	Photo     PhotoComment `json:"Photo"`
 }
 
-type CommentUser struct {
+type UserComment struct {
 	Id       int    `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }
 
-type CommentPhoto struct {
+type PhotoComment struct {
 	Id       int    `json:"id"`
 	Title    string `json:"title"`
 	Caption  string `json:"caption"`

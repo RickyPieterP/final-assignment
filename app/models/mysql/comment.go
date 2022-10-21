@@ -3,6 +3,8 @@ package mysql
 import (
 	"mygram/app/shared/constant"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Comment struct {
@@ -16,4 +18,15 @@ type Comment struct {
 
 func (Comment) TableName() string {
 	return constant.COMMENT
+}
+
+func (c *Comment) BeforeCreate(tx *gorm.DB) (err error) {
+	c.Created_Date = time.Now()
+	c.Updated_At = time.Now()
+	return
+}
+
+func (c *Comment) BeforeUpdate(tx *gorm.DB) (err error) {
+	c.Updated_At = time.Now()
+	return
 }

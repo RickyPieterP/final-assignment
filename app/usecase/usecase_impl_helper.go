@@ -38,7 +38,7 @@ func GenerateToken(in request.JWTToken) (string, error) {
 		Id:       in.Id,
 	}
 	claims := jwt.MapClaims{
-		"exp":     time.Now().Add(3 * time.Minute).Unix(),
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 		"payload": tok,
 	}
 

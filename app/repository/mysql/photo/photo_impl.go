@@ -24,7 +24,7 @@ func (p *photoRepo) Find(in int) (out []mysql.Photo, err error) {
 func (p *photoRepo) FindOne(in int) (out *mysql.Photo, err error) {
 	out = &mysql.Photo{}
 	err = p.mysql.Where("id = ?", &in).First(out).Error
-	fmt.Println(err, "error di findOne")
+	fmt.Println(err, "error di findOne photo")
 	return
 }
 

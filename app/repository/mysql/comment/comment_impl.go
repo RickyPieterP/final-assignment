@@ -23,17 +23,18 @@ func (c *commentRepo) Find(in int) (out []mysql.Comment, err error) {
 
 func (c *commentRepo) FindOne(in int) (out *mysql.Comment, err error) {
 	out = &mysql.Comment{}
-	err = c.mysql.Model(in).Where("id = ?", &in).First(out).Error
-	fmt.Println(err, "error di findOne")
+	err = c.mysql.Model(out).Where("id = ?", &in).First(out).Error
+	fmt.Println(err, "error di findOne comment")
 	return
 }
 
 func (c *commentRepo) Create(in *mysql.Comment) (out *mysql.Comment, err error) {
 	err = c.mysql.Model(in).Create(in).Error
 	if err != nil {
+
 		return nil, err
 	}
-	return
+	return in, nil
 }
 
 func (c *commentRepo) Update(in *mysql.Comment) (out *mysql.Comment, err error) {
@@ -43,7 +44,7 @@ func (c *commentRepo) Update(in *mysql.Comment) (out *mysql.Comment, err error) 
 		return nil, err
 	}
 	c.mysql.Where("id = ?", in.Id).First(out)
-	return
+	return out, nil
 }
 
 func (c *commentRepo) Delete(in int) (out bool, err error) {
