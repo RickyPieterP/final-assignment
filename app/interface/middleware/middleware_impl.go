@@ -26,6 +26,14 @@ func (m *middleware) AuthJwt(ctx *gin.Context) {
 
 	bearer := strings.Split(auth, "Bearer ")
 
+	if len(bearer) < 1 {
+		resp := map[string]interface{}{
+			"message": "Need Sign In",
+		}
+		ctx.AbortWithStatusJSON(http.StatusNotAcceptable, resp)
+		return
+	}
+
 	tokStr := bearer[1]
 
 	tok, err := uc.ValidateToken(tokStr)
@@ -169,12 +177,9 @@ func (m *middleware) DeletePhoto(c *gin.Context) {
 }
 
 func (m *middleware) FindSocialMedia(c *gin.Context) {
-	var req request.FindReq
-
 	jwt := c.MustGet("jwt").(*uc.Token)
-	req.UserId = jwt.Id
 
-	c.Set("user_id", req)
+	c.Set("user_id", jwt.Id)
 	c.Next()
 }
 
@@ -203,5 +208,44 @@ func (m *middleware) CreateSocialMedia(c *gin.Context) {
 
 	c.Set("body", req)
 	c.Set("user_id", jwt.Id)
+	c.Next()
+}
+
+func (m *middleware) UpdateSocialMedia(c *gin.Context) {
+	var req request.UpdateSocialMediaReq
+
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	jwt := c.MustGet("jwt").(*uc.Token)
+	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
+
+	c.Set("body", req)
+	c.Set("user_id", jwt.Id)
+	c.Set("social_media_id", socialMediaId)
+	c.Next()
+}
+
+func (m *middleware) DeleteSocialMedia(c *gin.Context) {
+	jwt := c.MustGet("jwt").(*uc.Token)
+	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
+
+	c.Set("user_id", jwt.Id)
+	c.Set("social_media_id", socialMediaId)
 	c.Next()
 }

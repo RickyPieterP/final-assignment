@@ -5,8 +5,8 @@ import "time"
 type FindSocialMediaRes struct {
 	ID             int       `json:"id"`
 	Name           string    `json:"name"`
-	SocialMediaURL int       `json:"social_media_url"`
-	UserID         string    `json:"user_id"`
+	SocialMediaURL string    `json:"social_media_url"`
+	UserID         int       `json:"user_id"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 	User           User      `json:"user"`
