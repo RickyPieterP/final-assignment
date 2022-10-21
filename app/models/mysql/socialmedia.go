@@ -10,8 +10,8 @@ import (
 type SocialMedia struct {
 	Id             int       `gorm:"column:id;primary_key"`
 	UserID         int       `gorm:"column:user_id"`
-	Name           string    `gorm:"column:name"`
-	SocialMediaUrl string    `gorm:"column:social_media_url"`
+	Name           string    `gorm:"column:name;not null"`
+	SocialMediaUrl string    `gorm:"column:social_media_url;not null"`
 	Created_At   time.Time `gorm:"column:created_at"`
 	Updated_At     time.Time `gorm:"column:updated_at"`
 }

@@ -36,7 +36,7 @@ func NewUsecase(
 }
 
 func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.RegisterUserRes, httpStatus int) {
-	var sqlUser mysql.AddUser
+	var sqlUser mysql.User
 
 	password, _ := GeneratePassword([]byte(in.Password))
 
@@ -52,9 +52,10 @@ func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.Registe
 		return
 	}
 
+	fmt.Println(userData, "userdata")
 	out.Age = userData.Age
 	out.Email = userData.Email
-	// out.ID = userData.Id
+	out.ID = userData.Id
 	out.Username = userData.Username
 	httpStatus = 201
 

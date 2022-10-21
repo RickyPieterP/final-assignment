@@ -9,22 +9,14 @@ import (
 
 type User struct {
 	Id           int       `gorm:"column:id;primary_key"`
-	Username     string    `gorm:"column:username"`
-	Email        string    `gorm:"column:email"`
-	Password     string    `gorm:"column:password"`
-	Age          int       `gorm:"column:age"`
+	Username     string    `gorm:"column:username;uniqueIndex"`
+	Email        string    `gorm:"column:email;uniqueIndex;not null"`
+	Password     string    `gorm:"column:password;not null"`
+	Age          int       `gorm:"column:age;not null"`
 	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
 }
 
-type AddUser struct {
-	Username     string    `gorm:"column:username"`
-	Email        string    `gorm:"column:email"`
-	Password     string    `gorm:"column:password"`
-	Age          int       `gorm:"column:age"`
-	Created_At time.Time `gorm:"column:created_at"`
-	Updated_At   time.Time `gorm:"column:updated_at"`
-}
 
 func (User) TableName() string {
 	return constant.USER
@@ -41,17 +33,3 @@ func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (AddUser) TableName() string {
-	return constant.USER
-}
-
-func (u *AddUser) BeforeCreate(tx *gorm.DB) (err error) {
-	u.Created_At= time.Now()
-	u.Updated_At = time.Now()
-	return
-}
-
-func (u *AddUser) BeforeUpdate(tx *gorm.DB) (err error) {
-	u.Updated_At = time.Now()
-	return
-}

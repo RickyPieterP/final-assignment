@@ -10,9 +10,9 @@ import (
 type Photo struct {
 	Id           int    `gorm:"column:id;primary_key"`
 	UserId       int    `gorm:"column:user_id"`
-	Title        string `gorm:"column:title"`
-	Caption      string `gorm:"column:caption"`
-	PhotoUrl     string `gorm:"column:photo_url"`
+	Title        string `gorm:"column:title;not null"`
+	Caption      string `gorm:"column:caption;not null"`
+	PhotoUrl     string `gorm:"column:photo_url;not null"`
 	User         User
 	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
