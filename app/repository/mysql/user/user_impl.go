@@ -31,4 +31,13 @@ func (u *userRepo) FindById(in mysql.User) (out mysql.User, err error) {
 	return
 }
 
-func (*userRepo) DeleteUser() {}
+func (u *userRepo) UpdateUser(in mysql.User) (out mysql.User, err error) {
+	err = u.mysql.Where("id = ?", in.Id).Updates(&in).Error
+	out = in
+	return
+}
+
+func (u *userRepo) DeleteUser(in mysql.User) (err error) {
+	err = u.mysql.Where("id = ?", in.Id).Delete(&in).Error
+	return
+}
