@@ -20,8 +20,8 @@ func (s *socialmediaRepo) Find(id int) {
 	return
 }
 
-func (s *socialmediaRepo) Create(in mysql.SocialMedia) (out mysql.SocialMedia, err error) {
-	err = s.mysql.DB.Create(in).Error
+func (s *socialmediaRepo) SaveOrUpdate(in mysql.SocialMedia) (out mysql.SocialMedia, err error) {
+	err = s.mysql.Debug().Save(&in).Error
 	out = in
 	return
 }

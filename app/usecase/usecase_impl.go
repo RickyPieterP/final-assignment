@@ -269,12 +269,22 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error) {
 	var sqlSocialMedia mysql.SocialMedia
 
+	userId := userID.(int)
+
 	sqlSocialMedia.Name = in.Name
 	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
+	sqlSocialMedia.UserID = userId
 
-	data, err := u.socialmediaRepo.Create(sqlSocialMedia)
+	data, err := u.socialmediaRepo.SaveOrUpdate(sqlSocialMedia)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	out.ID = data.Id
+	out.Name = data.Name
+	out.SocialMediaURL = data.SocialMediaUrl
+	out.UserID = userId
+	out.CreatedAt = data.Created_Date
 
 	return
 }
