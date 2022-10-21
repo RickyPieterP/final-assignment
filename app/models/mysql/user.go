@@ -13,7 +13,7 @@ type User struct {
 	Email        string    `gorm:"column:email"`
 	Password     string    `gorm:"column:password"`
 	Age          int       `gorm:"column:age"`
-	Created_Date time.Time `gorm:"column:created_date"`
+	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
 }
 
@@ -22,7 +22,7 @@ type AddUser struct {
 	Email        string    `gorm:"column:email"`
 	Password     string    `gorm:"column:password"`
 	Age          int       `gorm:"column:age"`
-	Created_Date time.Time `gorm:"column:created_date"`
+	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
 }
 
@@ -31,7 +31,7 @@ func (User) TableName() string {
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	u.Created_Date = time.Now()
+	u.Created_At = time.Now()
 	u.Updated_At = time.Now()
 	return
 }
@@ -46,7 +46,7 @@ func (AddUser) TableName() string {
 }
 
 func (u *AddUser) BeforeCreate(tx *gorm.DB) (err error) {
-	u.Created_Date = time.Now()
+	u.Created_At= time.Now()
 	u.Updated_At = time.Now()
 	return
 }

@@ -7,5 +7,5 @@ type CreateCommentResp struct {
 	UserId    int       `json:"user_id"`
 	PhotoId   int       `json:"photo_id"`
 	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"created_date"`
+	CreatedAt time.Time `json:"created_at"`
 }

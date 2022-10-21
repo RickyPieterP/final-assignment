@@ -95,11 +95,57 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 	return res, 200, nil
 }
 
-func (u *usecase) UpdateUser(in request.UpdateUserReq) {
-	var sqlUser mysql.User
-	sqlUser.Email = in.Email
-	sqlUser.Username = in.Username
-	
+func (u *usecase) UpdateUser(in request.UpdateUserReq) (out *response.UpdateUserRes, httpStatus int, err error) {
+	user := mysql.User{
+		Id: in.Id,
+	}
+
+	req, err := u.userRepo.FindById(user)
+	if err != nil {
+		return nil, http.StatusNotFound, err
+	}
+	req.Email = in.Email
+	req.Username = in.Username
+	req.Updated_At = time.Now()
+
+	resp, err := u.userRepo.UpdateUser(req)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	out = &response.UpdateUserRes{
+		Age:       req.Age,
+		Email:     resp.Email,
+		ID:        in.Id,
+		Username:  resp.Username,
+		UpdatedAt: resp.Updated_At.Format("2006-01-02"),
+	}
+
+	return
+}
+
+func (u *usecase) DeleteUser(in Token) (out *response.DeleteUser, httpStatus int, err error) {
+
+	user := mysql.User{
+		Id: in.Id,
+	}
+
+	_, err = u.userRepo.FindById(user)
+	if err != nil {
+		return nil, http.StatusNotFound, err
+	}
+
+	err = u.userRepo.DeleteUser(user)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	out = &response.DeleteUser{
+		Message: "Your account has been successfully deleted",
+	}
+	return
 }
 
 func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
@@ -122,7 +168,7 @@ func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreateP
 		Title:     res.Title,
 		Caption:   res.Caption,
 		PhotoUrl:  res.PhotoUrl,
-		CreatedAt: res.Created_Date,
+		CreatedAt: res.Created_At,
 		UserId:    in.UserId,
 	}
 	return resp, 200, nil
@@ -151,7 +197,7 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 			Caption:   res[i].Caption,
 			PhotoUrl:  res[i].PhotoUrl,
 			UserId:    in.UserId,
-			CreatedAt: res[i].Created_Date,
+			CreatedAt: res[i].Created_At,
 			UpdatedAt: res[i].Updated_At,
 			User:      singleUser,
 		}
@@ -240,7 +286,7 @@ func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.Cre
 		UserId:    res.UserId,
 		PhotoId:   res.PhotoId,
 		Message:   res.Message,
-		CreatedAt: res.Created_Date,
+		CreatedAt: res.Created_At,
 	}
 	return resp, 200, nil
 }
@@ -278,7 +324,7 @@ func (u *usecase) FindComment(in *request.FindCommentReq) (out []response.FindCo
 			Message:   res[i].Message,
 			PhotoId:   res[i].PhotoId,
 			UserId:    in.UserId,
-			CreatedAt: res[i].Created_Date,
+			CreatedAt: res[i].Created_At,
 			UpdatedAt: res[i].Updated_At,
 			User:      singleUser,
 			Photo:     photoResp,
@@ -363,7 +409,7 @@ func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any)
 	out.Name = data.Name
 	out.SocialMediaURL = data.SocialMediaUrl
 	out.UserID = userId
-	out.CreatedAt = data.Created_Date
+	out.CreatedAt = data.Created_At
 
 	return
 }
@@ -388,7 +434,7 @@ func (u *usecase) FindSocialMedia(in any) (out response.FindSocialMediaRes, http
 	out.Name = dataSocialMedia.Name
 	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
 	out.UserID = userId
-	out.CreatedAt = dataSocialMedia.Created_Date
+	out.CreatedAt = dataSocialMedia.Created_At
 	out.UpdatedAt = dataSocialMedia.Updated_At
 	out.User = response.User{
 		ID:       userId,
