@@ -96,7 +96,10 @@ func (u *usecase) LoginUser(in request.LoginUserReq) (out *response.LoginUserRes
 }
 
 func (u *usecase) UpdateUser(in request.UpdateUserReq) {
-	// var sqlUser mysql.User
+	var sqlUser mysql.User
+	sqlUser.Email = in.Email
+	sqlUser.Username = in.Username
+	
 }
 
 func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
