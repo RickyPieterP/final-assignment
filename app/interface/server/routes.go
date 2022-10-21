@@ -18,6 +18,8 @@ func setupRouter(transport *transport.Tp, middleware middleware.Middleware, app 
 	users := app.Group("/users")
 	users.POST("/register", middleware.RegisterUser, transport.Transport.RegisterUser)
 	users.POST("/login", middleware.LoginUser, transport.Transport.LoginUser)
+	users.PUT("/update", middleware.AuthJwt, middleware.UpdateUser, transport.Transport.UpdateUser)
+	users.DELETE("/delete", middleware.AuthJwt, middleware.DeleteUser, transport.Transport.DeleteUser)
 	photo := app.Group("/photo")
 	photo.POST("/create", middleware.AuthJwt, middleware.CreatePhoto, transport.Transport.CreatePhoto)
 	photo.GET("/", middleware.AuthJwt, middleware.FindPhoto, transport.Transport.FindPhoto)
