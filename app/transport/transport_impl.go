@@ -45,6 +45,39 @@ func (t *Transport) LoginUser(c *gin.Context) {
 	}
 }
 
+func (t *Transport) UpdateUser(c *gin.Context) {
+	body := c.MustGet("body").(request.UpdateUserReq)
+
+	res, httpStatus, err := t.usecase.UpdateUser(body)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.JSON(httpStatus, resp)
+		return
+	} else {
+		c.JSON(http.StatusOK, res)
+		return
+	}
+}
+
+func (t *Transport) DeleteUser(c *gin.Context) {
+	body := c.MustGet("body").(*usecase.Token)
+
+	res, httpStatus, err := t.usecase.DeleteUser(*body)
+
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.JSON(httpStatus, resp)
+		return
+	} else {
+		c.JSON(http.StatusOK, res)
+		return
+	}
+}
+
 func (t *Transport) CreatePhoto(c *gin.Context) {
 	body := c.MustGet("body").(request.CreatePhotoReq)
 

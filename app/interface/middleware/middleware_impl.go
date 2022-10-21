@@ -92,6 +92,42 @@ func (m *middleware) LoginUser(c *gin.Context) {
 	c.Next()
 }
 
+func (m *middleware) UpdateUser(c *gin.Context) {
+	var req request.UpdateUserReq
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	jwt := c.MustGet("jwt").(*uc.Token)
+	req.Id = jwt.Id
+
+	c.Set("body", req)
+	c.Next()
+}
+
+func (m *middleware) DeleteUser(c *gin.Context) {
+
+	jwt := c.MustGet("jwt").(*uc.Token)
+
+	c.Set("body", jwt)
+	c.Next()
+}
+
 func (m *middleware) CreatePhoto(c *gin.Context) {
 	var req request.CreatePhotoReq
 
