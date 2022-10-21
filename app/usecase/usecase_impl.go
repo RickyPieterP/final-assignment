@@ -35,7 +35,7 @@ func NewUsecase(
 }
 
 func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.RegisterUserRes, httpStatus int) {
-	var sqlUser mysql.AddUser
+	var sqlUser mysql.User
 
 	password, _ := GeneratePassword([]byte(in.Password))
 
@@ -53,7 +53,7 @@ func (u *usecase) RegisterUser(in request.RegisterUserReq) (out response.Registe
 
 	out.Age = userData.Age
 	out.Email = userData.Email
-	// out.ID = userData.Id
+	out.ID = userData.Id
 	out.Username = userData.Username
 	httpStatus = 201
 
@@ -119,7 +119,7 @@ func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreateP
 		Caption:   res.Caption,
 		PhotoUrl:  res.PhotoUrl,
 		CreatedAt: res.Created_Date,
-		UserId: in.UserId,
+		UserId:    in.UserId,
 	}
 	return resp, 200, nil
 }
@@ -134,22 +134,22 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 		return
 	}
 	singleUser := response.UserPhoto{
-		Email: user.Email,
+		Email:    user.Email,
 		Username: user.Username,
 	}
 	fmt.Println(singleUser, "single user")
 	res, err := u.photoRepo.Find(in.UserId)
 	for i := 0; i < len(res); i++ {
-		
+
 		single := response.FindPhotoResp{
-			Id: res[i].Id,
-			Title: res[i].Title,
-			Caption: res[i].Caption,
-			PhotoUrl: res[i].PhotoUrl,
-			UserId: in.UserId,
+			Id:        res[i].Id,
+			Title:     res[i].Title,
+			Caption:   res[i].Caption,
+			PhotoUrl:  res[i].PhotoUrl,
+			UserId:    in.UserId,
 			CreatedAt: res[i].Created_Date,
 			UpdatedAt: res[i].Updated_At,
-			User: singleUser,
+			User:      singleUser,
 		}
 
 		out = append(out, single)
@@ -157,11 +157,11 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 	return
 }
 
-func(u *usecase) UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
+func (u *usecase) UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
 	photo := &mysql.Photo{
-		Id: in.Id,
-		Title: in.Title,
-		Caption: in.Caption,
+		Id:       in.Id,
+		Title:    in.Title,
+		Caption:  in.Caption,
 		PhotoUrl: in.PhotoUrl,
 	}
 	check, err := u.photoRepo.FindOne(photo.Id)
@@ -182,11 +182,11 @@ func(u *usecase) UpdatePhoto(in *request.UpdatePhoto) (out *response.UpdatePhoto
 	}
 	fmt.Println(res, "res")
 	out = &response.UpdatePhotoResp{
-		Id: res.Id,
-		Title: res.Title,
-		Caption: res.Caption,
-		PhotoUrl: res.PhotoUrl,
-		UserId: in.UserId,
+		Id:        res.Id,
+		Title:     res.Title,
+		Caption:   res.Caption,
+		PhotoUrl:  res.PhotoUrl,
+		UserId:    in.UserId,
 		UpdatedAt: res.Updated_At,
 	}
 	return
@@ -217,30 +217,28 @@ func (u *usecase) DeletePhoto(in, user_id int) (out *response.DeletePhoto, err e
 	}
 }
 
-
-func (u *usecase) CreateComment(in *request.CreatePhotoReq) (out *response.CreatePhotoResp, httpStatus int, err error) {
+func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.CreateCommentResp, httpStatus int, err error) {
 	fmt.Println(in.UserId, "in user id")
-	// photo := &mysql.Comment{
-	// 	UserId:   in.UserId,
-	// 	Title:    in.Title,
+	comment := &mysql.Comment{
+		UserId:  in.UserId,
+		PhotoId: in.PhotoId,
+		Message: in.Message,
+	}
 
-	// }
+	res, err := u.commentRepo.Create(comment)
+	if err != nil {
+		fmt.Println(err, "error di create photo")
+		return nil, 400, err
+	}
 
-	// res, err := u.commentRepo.Create()
-	// if err != nil {
-	// 	fmt.Println(err, "error di create photo")
-	// 	return nil, 400, err
-	// }
-
-	// resp := &response.CreatePhotoResp{
-	// 	Id:        res.Id,
-	// 	Title:     res.Title,
-	// 	Caption:   res.Caption,
-	// 	PhotoUrl:  res.PhotoUrl,
-	// 	CreatedAt: res.Created_Date,
-	// 	UserId: in.UserId,
-	// }
-	return out, 200, nil
+	resp := &response.CreateCommentResp{
+		Id:        res.Id,
+		Mesage:    res.Message,
+		CreatedAt: res.Created_Date,
+		UserId:    in.UserId,
+		PhotoId:   res.PhotoId,
+	}
+	return resp, 200, nil
 }
 
 func (u *usecase) FindComment(in *request.FindReq) (out []response.FindPhotoResp, httpStatus int, err error) {
@@ -253,22 +251,22 @@ func (u *usecase) FindComment(in *request.FindReq) (out []response.FindPhotoResp
 		return
 	}
 	singleUser := response.UserPhoto{
-		Email: user.Email,
+		Email:    user.Email,
 		Username: user.Username,
 	}
 	fmt.Println(singleUser, "single user")
 	res, err := u.photoRepo.Find(in.UserId)
 	for i := 0; i < len(res); i++ {
-		
+
 		single := response.FindPhotoResp{
-			Id: res[i].Id,
-			Title: res[i].Title,
-			Caption: res[i].Caption,
-			PhotoUrl: res[i].PhotoUrl,
-			UserId: in.UserId,
+			Id:        res[i].Id,
+			Title:     res[i].Title,
+			Caption:   res[i].Caption,
+			PhotoUrl:  res[i].PhotoUrl,
+			UserId:    in.UserId,
 			CreatedAt: res[i].Created_Date,
 			UpdatedAt: res[i].Updated_At,
-			User: singleUser,
+			User:      singleUser,
 		}
 
 		out = append(out, single)
@@ -276,11 +274,11 @@ func (u *usecase) FindComment(in *request.FindReq) (out []response.FindPhotoResp
 	return
 }
 
-func(u *usecase) UpdateComment(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
+func (u *usecase) UpdateComment(in *request.UpdatePhoto) (out *response.UpdatePhotoResp, err error) {
 	photo := &mysql.Photo{
-		Id: in.Id,
-		Title: in.Title,
-		Caption: in.Caption,
+		Id:       in.Id,
+		Title:    in.Title,
+		Caption:  in.Caption,
 		PhotoUrl: in.PhotoUrl,
 	}
 	check, err := u.photoRepo.FindOne(photo.Id)
@@ -301,11 +299,11 @@ func(u *usecase) UpdateComment(in *request.UpdatePhoto) (out *response.UpdatePho
 	}
 	fmt.Println(res, "res")
 	out = &response.UpdatePhotoResp{
-		Id: res.Id,
-		Title: res.Title,
-		Caption: res.Caption,
-		PhotoUrl: res.PhotoUrl,
-		UserId: in.UserId,
+		Id:        res.Id,
+		Title:     res.Title,
+		Caption:   res.Caption,
+		PhotoUrl:  res.PhotoUrl,
+		UserId:    in.UserId,
 		UpdatedAt: res.Updated_At,
 	}
 	return
@@ -334,4 +332,17 @@ func (u *usecase) DeleteComment(in, user_id int) (out *response.DeletePhoto, err
 		}
 		return
 	}
+}
+
+func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error) {
+	var sqlSocialMedia mysql.SocialMedia
+
+	sqlSocialMedia.Name = in.Name
+	sqlSocialMedia.SocialMediaUrl = in.SocialMediaURL
+
+	data, err := u.socialmediaRepo.Create(sqlSocialMedia)
+
+	out.ID = data.Id
+
+	return
 }

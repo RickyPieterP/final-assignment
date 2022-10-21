@@ -15,8 +15,9 @@ func NewUserRepo(mysql *database.MySQL) RepositoryUser {
 	}
 }
 
-func (u *userRepo) SaveOrUpdate(in mysql.AddUser) (out mysql.User, err error) {
-	err = u.mysql.Create(&in).Error
+func (u *userRepo) SaveOrUpdate(in mysql.User) (out mysql.User, err error) {
+	err = u.mysql.Save(&in).Error
+	out = in
 	return
 }
 
