@@ -141,3 +141,50 @@ func (t *Transport) DeleteComment(c *gin.Context) {
 		c.JSON(http.StatusCreated, res)
 	}
 }
+
+func (t *Transport) CreateSocialMedia(c *gin.Context) {
+	body := c.MustGet("body").(request.CreateSocialMediaReq)
+	userID := c.MustGet("user_id")
+	res, httpStatus, err := t.usecase.CreateSocialMedia(body, userID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) FindSocialMedia(c *gin.Context) {
+	userID := c.MustGet("user_id")
+	res, httpStatus, err := t.usecase.FindSocialMedia(userID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) UpdateSocialMedia(c *gin.Context) {
+	body := c.MustGet("body").(request.UpdateSocialMediaReq)
+	userID := c.MustGet("user_id")
+	socialMediaID := c.MustGet("social_media_id")
+	res, httpStatus, err := t.usecase.UpdateSocialMedia(body, userID, socialMediaID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}
+
+func (t *Transport) DeleteSocialMedia(c *gin.Context) {
+	socialMediaID := c.MustGet("social_media_id")
+	res, httpStatus, err := t.usecase.DeleteSocialMedia(socialMediaID)
+	if err != nil {
+		c.JSON(httpStatus, err)
+		return
+	} else {
+		c.JSON(httpStatus, res)
+	}
+}

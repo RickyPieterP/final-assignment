@@ -245,3 +245,77 @@ func (m *middleware) DeleteComment(c *gin.Context) {
 	c.Set("comment_id", commentId)
 	c.Next()
 }
+
+func (m *middleware) FindSocialMedia(c *gin.Context) {
+	jwt := c.MustGet("jwt").(*uc.Token)
+
+	c.Set("user_id", jwt.Id)
+	c.Next()
+}
+
+func (m *middleware) CreateSocialMedia(c *gin.Context) {
+	var req request.CreateSocialMediaReq
+
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	jwt := c.MustGet("jwt").(*uc.Token)
+
+	c.Set("body", req)
+	c.Set("user_id", jwt.Id)
+	c.Next()
+}
+
+func (m *middleware) UpdateSocialMedia(c *gin.Context) {
+	var req request.UpdateSocialMediaReq
+
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(req); err != nil {
+		resp := map[string]interface{}{
+			"message": err.Error(),
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	jwt := c.MustGet("jwt").(*uc.Token)
+	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
+
+	c.Set("body", req)
+	c.Set("user_id", jwt.Id)
+	c.Set("social_media_id", socialMediaId)
+	c.Next()
+}
+
+func (m *middleware) DeleteSocialMedia(c *gin.Context) {
+	jwt := c.MustGet("jwt").(*uc.Token)
+	socialMediaId, _ := strconv.Atoi(c.Param("socialMediaId"))
+
+	c.Set("user_id", jwt.Id)
+	c.Set("social_media_id", socialMediaId)
+	c.Next()
+}

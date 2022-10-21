@@ -16,4 +16,8 @@ type Usecase interface {
 	FindComment(in *request.FindCommentReq) (out []response.FindCommentResp, httpStatus int, err error)
 	UpdateComment(in *request.UpdateComment) (out *response.UpdateCommentResp, err error)
 	DeleteComment(in, user_id int) (out *response.DeleteComment, err error)
+	CreateSocialMedia(in request.CreateSocialMediaReq, userID any) (out response.CreateSocialMediaRes, httpStatus int, err error)
+	FindSocialMedia(in any) (out response.FindSocialMediaRes, httpStatus int, err error)
+	UpdateSocialMedia(in request.UpdateSocialMediaReq, userID any, socialMediaID any) (out response.UpdateSocialMediaRes, httpStatus int, err error)
+	DeleteSocialMedia(socialMediaID any) (out string, httpStatus int, err error)
 }
