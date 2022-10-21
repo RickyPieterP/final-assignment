@@ -168,7 +168,7 @@ func (u *usecase) CreatePhoto(in *request.CreatePhotoReq) (out *response.CreateP
 		Title:     res.Title,
 		Caption:   res.Caption,
 		PhotoUrl:  res.PhotoUrl,
-		CreatedAt: res.Created_Date,
+		CreatedAt: res.Created_At,
 		UserId:    in.UserId,
 	}
 	return resp, 200, nil
@@ -197,7 +197,7 @@ func (u *usecase) FindPhoto(in *request.FindReq) (out []response.FindPhotoResp, 
 			Caption:   res[i].Caption,
 			PhotoUrl:  res[i].PhotoUrl,
 			UserId:    in.UserId,
-			CreatedAt: res[i].Created_Date,
+			CreatedAt: res[i].Created_At,
 			UpdatedAt: res[i].Updated_At,
 			User:      singleUser,
 		}
@@ -286,7 +286,7 @@ func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.Cre
 		UserId:    res.UserId,
 		PhotoId:   res.PhotoId,
 		Message:   res.Message,
-		CreatedAt: res.Created_Date,
+		CreatedAt: res.Created_At,
 	}
 	return resp, 200, nil
 }
@@ -324,7 +324,7 @@ func (u *usecase) FindComment(in *request.FindCommentReq) (out []response.FindCo
 			Message:   res[i].Message,
 			PhotoId:   res[i].PhotoId,
 			UserId:    in.UserId,
-			CreatedAt: res[i].Created_Date,
+			CreatedAt: res[i].Created_At,
 			UpdatedAt: res[i].Updated_At,
 			User:      singleUser,
 			Photo:     photoResp,
@@ -409,7 +409,7 @@ func (u *usecase) CreateSocialMedia(in request.CreateSocialMediaReq, userID any)
 	out.Name = data.Name
 	out.SocialMediaURL = data.SocialMediaUrl
 	out.UserID = userId
-	out.CreatedAt = data.Created_Date
+	out.CreatedAt = data.Created_At
 
 	return
 }
@@ -434,7 +434,7 @@ func (u *usecase) FindSocialMedia(in any) (out response.FindSocialMediaRes, http
 	out.Name = dataSocialMedia.Name
 	out.SocialMediaURL = dataSocialMedia.SocialMediaUrl
 	out.UserID = userId
-	out.CreatedAt = dataSocialMedia.Created_Date
+	out.CreatedAt = dataSocialMedia.Created_At
 	out.UpdatedAt = dataSocialMedia.Updated_At
 	out.User = response.User{
 		ID:       userId,

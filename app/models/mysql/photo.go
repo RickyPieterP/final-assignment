@@ -14,7 +14,7 @@ type Photo struct {
 	Caption      string `gorm:"column:caption"`
 	PhotoUrl     string `gorm:"column:photo_url"`
 	User         User
-	Created_Date time.Time `gorm:"column:created_date"`
+	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
 }
 
@@ -23,7 +23,7 @@ func (Photo) TableName() string {
 }
 
 func (p *Photo) BeforeCreate(tx *gorm.DB) (err error) {
-	p.Created_Date = time.Now()
+	p.Created_At = time.Now()
 	p.Updated_At = time.Now()
 	return
 }

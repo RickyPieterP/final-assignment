@@ -12,7 +12,7 @@ type Comment struct {
 	UserId       int       `gorm:"column:user_id"`
 	PhotoId      int       `gorm:"column:photo_id"`
 	Message      string    `gorm:"column:message"`
-	Created_Date time.Time `gorm:"column:created_date"`
+	Created_At time.Time `gorm:"column:created_at"`
 	Updated_At   time.Time `gorm:"column:updated_at"`
 }
 
@@ -21,7 +21,7 @@ func (Comment) TableName() string {
 }
 
 func (c *Comment) BeforeCreate(tx *gorm.DB) (err error) {
-	c.Created_Date = time.Now()
+	c.Created_At = time.Now()
 	c.Updated_At = time.Now()
 	return
 }

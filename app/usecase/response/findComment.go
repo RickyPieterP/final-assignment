@@ -7,7 +7,7 @@ type FindCommentResp struct {
 	Message   string       `json:"message"`
 	PhotoId   int          `json:"photo_id"`
 	UserId    int          `json:"user_id"`
-	CreatedAt time.Time    `json:"created_date"`
+	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	User      UserComment  `json:"User"`
 	Photo     PhotoComment `json:"Photo"`
