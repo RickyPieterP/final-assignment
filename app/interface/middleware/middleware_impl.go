@@ -29,7 +29,7 @@ func (m *middleware) AuthJwt(ctx *gin.Context) {
 	tokStr := bearer[1]
 
 	tok, err := uc.ValidateToken(tokStr)
-	fmt.Println(err, "errr")
+
 	if err != nil {
 		resp := map[string]interface{}{
 			"message": "Need Sign In",
