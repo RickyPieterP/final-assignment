@@ -3,6 +3,8 @@ package mysql
 import (
 	"mygram/app/shared/constant"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type SocialMedia struct {
@@ -16,4 +18,15 @@ type SocialMedia struct {
 
 func (SocialMedia) TableName() string {
 	return constant.SOCIALMEDIA
+}
+
+func (p *SocialMedia) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Created_Date = time.Now()
+	p.Updated_At = time.Now()
+	return
+}
+
+func (p *SocialMedia) BeforeUpdate(tx *gorm.DB) (err error) {
+	p.Updated_At = time.Now()
+	return
 }

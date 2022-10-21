@@ -223,7 +223,6 @@ func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.Cre
 	comment := &mysql.Comment{
 		UserId:  in.UserIdComment,
 		PhotoId: in.PhotoId,
-		Title:   in.Tittle,
 		Message: in.Message,
 	}
 
@@ -237,7 +236,6 @@ func (u *usecase) CreateComment(in *request.CreateCommentReq) (out *response.Cre
 		Id:        res.Id,
 		UserId:    res.UserId,
 		PhotoId:   res.PhotoId,
-		Tittle:    res.Title,
 		Message:   res.Message,
 		CreatedAt: res.Created_Date,
 	}
@@ -250,25 +248,37 @@ func (u *usecase) FindComment(in *request.FindCommentReq) (out []response.FindCo
 	}
 	user, err = u.userRepo.FindById(user)
 	if err != nil {
-		fmt.Println(err, "error di find")
 		return
 	}
 	singleUser := response.UserComment{
+		Id:       in.UserId,
 		Email:    user.Email,
 		Username: user.Username,
 	}
-	fmt.Println(singleUser, "single user")
 	res, err := u.commentRepo.Find(in.UserId)
 	for i := 0; i < len(res); i++ {
+
+		photo, err := u.photoRepo.FindOne(res[i].PhotoId)
+		if err != nil {
+			fmt.Println(err, "error")
+		}
+		photoResp := response.PhotoComment{
+			Id:       photo.Id,
+			Title:    photo.Title,
+			Caption:  photo.Caption,
+			PhotoUrl: photo.PhotoUrl,
+			UserId:   in.UserId,
+		}
 
 		single := response.FindCommentResp{
 			Id:        res[i].Id,
 			Message:   res[i].Message,
-			PhotoId:   res[i].UserId,
+			PhotoId:   res[i].PhotoId,
 			UserId:    in.UserId,
 			CreatedAt: res[i].Created_Date,
 			UpdatedAt: res[i].Updated_At,
 			User:      singleUser,
+			Photo:     photoResp,
 		}
 
 		out = append(out, single)
@@ -279,7 +289,6 @@ func (u *usecase) FindComment(in *request.FindCommentReq) (out []response.FindCo
 func (u *usecase) UpdateComment(in *request.UpdateComment) (out *response.UpdateCommentResp, err error) {
 	comment := &mysql.Comment{
 		Id:      in.Id,
-		Title:   in.TitleValue,
 		Message: in.MessageValue,
 	}
 
@@ -297,12 +306,12 @@ func (u *usecase) UpdateComment(in *request.UpdateComment) (out *response.Update
 	if err != nil {
 		return
 	}
-	fmt.Println("Hasil Update == ", res)
+
 	out = &response.UpdateCommentResp{
 		Id:        res.Id,
-		Title:     res.Title,
 		Message:   res.Message,
 		UserId:    in.UserId,
+		PhotoId:   res.PhotoId,
 		UpdatedAt: res.Updated_At,
 	}
 	return

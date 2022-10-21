@@ -27,3 +27,8 @@ func (p *Photo) BeforeCreate(tx *gorm.DB) (err error) {
 	p.Updated_At = time.Now()
 	return
 }
+
+func (p *Photo) BeforeUpdate(tx *gorm.DB) (err error) {
+	p.Updated_At = time.Now()
+	return
+}
